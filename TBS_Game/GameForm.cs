@@ -12,13 +12,10 @@ namespace TBS_Game
         TableLayoutPanel Panel;
         public GameForm()
         {
-
+            DoubleBuffered = true;
             GenerateMap(40);
-            //this.SuspendLayout();
             Panel = LayoutPanels.CreateFieldPanel();
             Controls.Add(Panel);
-            //Panel.ResumeLayout();
-            //ResumeLayout();
             InitializeMap(Panel);
         }
 
@@ -37,11 +34,12 @@ namespace TBS_Game
         {
             if (isDragging)
             {
-                var newLocation = GameForm.MousePosition;
-                Panel.Location = new Point(Panel.Location.X + newLocation.X - oldLocation.X, Panel.Location.Y + newLocation.Y - oldLocation.Y);
+                var newLocation = MousePosition;
+                Panel.Location = new Point(Panel.Location.X + (int)(2 * newLocation.X) - oldLocation.X, Panel.Location.Y + (int)(2 * newLocation.Y) - oldLocation.Y);
+                Invalidate();
             }
 
-            oldLocation = GameForm.MousePosition;
+            oldLocation = new Point((2 * MousePosition.X), (2 * MousePosition.Y));
         }
 
         private void Event_MouseUp(object sender, MouseEventArgs e)
@@ -58,6 +56,11 @@ namespace TBS_Game
             }
         }
 
+        /// <summary>
+        /// этот метод создает pictureBox - ячейку поля
+        /// </summary>
+        /// <param name="pic">картинка для ячейки</param>
+        /// <returns>pictureBox - ячейка поля</returns>
         public PictureBox GetPicture(Bitmap pic)
         {
             var picture = new PictureBox();
@@ -72,6 +75,10 @@ namespace TBS_Game
             return picture;
         }
 
+        /// <summary>
+        /// этот метод заполняет карту картинками
+        /// </summary>
+        /// <param name="panel"></param>
         public void InitializeMap(TableLayoutPanel panel)
         {
             var rnd = new Random();

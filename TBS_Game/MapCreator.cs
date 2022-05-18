@@ -19,7 +19,6 @@ namespace TBS_Game
     public static class MapCreator
     {
         public static int MapSize { get; private set; }
-        static Random rnd = new Random();
         public static Cell[,] Map { get; set; }
 
         /// <summary>

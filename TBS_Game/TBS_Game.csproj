@@ -85,7 +85,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Textures\Structure\Castle.png" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Textures\Tile\BigForest1.png" />
   </ItemGroup>
