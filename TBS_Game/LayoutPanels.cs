@@ -13,6 +13,10 @@ namespace TBS_Game
         static private int FieldSize = 120;
         static private int FieldsCount = MapCreator.MapSize;
 
+        /// <summary>
+        /// данный метод создает TableLayoutPanel для хранения ячеек
+        /// </summary>
+        /// <returns></returns>
         public static TableLayoutPanel CreateFieldPanel()
         {
             var panel = new TableLayoutPanel();

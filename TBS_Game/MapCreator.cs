@@ -15,7 +15,7 @@ namespace TBS_Game
         SmallForest,
         Forest
     };
-    
+
     public static class MapCreator
     {
         public static int MapSize { get; private set; }
@@ -31,7 +31,7 @@ namespace TBS_Game
             MapSize = size;
             Point initialPoint = new Point(rand.Next(0, size), rand.Next(0, size));
 
-            Map = new Cell[size,size];
+            Map = new Cell[size, size];
 
             var queue = new Queue<Point>();
             queue.Enqueue(initialPoint);
@@ -48,7 +48,7 @@ namespace TBS_Game
                     for (var dx = -1; dx <= 1; dx++)
                     {
                         if (dx != 0 && dy != 0) continue;
-                        if (point.X + dx < 0 || point.X + dx > MapSize - 1 || point.Y +dy <0 || point.Y + dy > MapSize - 1) continue;
+                        if (point.X + dx < 0 || point.X + dx > MapSize - 1 || point.Y + dy < 0 || point.Y + dy > MapSize - 1) continue;
 
                         var neighbourPosition = new Point(point.X + dx, point.Y + dy);
                         neighbours.Add(Map[neighbourPosition.X, neighbourPosition.Y]);
@@ -57,18 +57,40 @@ namespace TBS_Game
 
                 var possibleCells = new List<Cell>() { Cell.SmallForest, Cell.Grass, Cell.Forest };
 
-                if(point.X == initialPoint.X && point.Y == initialPoint.Y)
+                if (point.X == initialPoint.X && point.Y == initialPoint.Y)
                     possibleCells = new List<Cell> { Cell.Grass };
 
                 if (neighbours.Contains(Cell.Grass))
                     possibleCells.Remove(Cell.Forest);
-                
+
                 if (neighbours.Contains(Cell.Forest))
                     possibleCells.Remove(Cell.Grass);
 
                 Map[point.X, point.Y] = possibleCells[rand.Next(possibleCells.Count)];
-            }           
+            }
         }
-        
+
+        /// <summary>
+        /// Этот метод создает массив клеток-соседей
+        /// </summary>
+        /// <param name="i">строка</param>
+        /// <param name="j">столбец</param>
+        /// <param name="isSimpleSearch">true для игнорирования диагональных клеток</param>
+        /// <returns>массив клеток - соседей</returns>
+        public static Cell[] GetNeighbours(int i, int j, bool isSimpleSearch)
+        {
+            var neighbours = new List<Cell>();
+            for (var dy = -1; dy <= 1; dy++)
+                for (var dx = -1; dx <= 1; dx++)
+                {
+                    if(isSimpleSearch)
+                        if (dx != 0 && dy != 0) continue;
+
+                    if (i + dx < 0 || i + dx > MapSize - 1 || j + dy < 0 || j + dy > MapSize - 1) continue;
+
+                    neighbours.Add(Map[i + dx, j + dy]);
+                }
+            return neighbours.ToArray();
+        }
     }
 }
