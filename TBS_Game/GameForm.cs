@@ -2,22 +2,52 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using static TBS_Game.MapCreator;
 using static TBS_Game.UnitMap;
+using static TBS_Game.Player;
 
 namespace TBS_Game
 {
     public partial class GameForm : Form
     {
+        public static Player[] Players;
+        public static int CurrentPlayerIndex;
+
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
+
         TableLayoutPanel Panel;
+        private const int WM_SETREDRAW = 11;
         public GameForm()
         {
+            Players = InitializePlayers();
+            CurrentPlayerIndex = 0;
             DoubleBuffered = true;
-            GenerateMap(40);
+            MouseWheel += Event_MouseWheel;
+            GenerateMap(30);
             Panel = LayoutPanels.CreateFieldPanel();
-            Controls.Add(Panel);
             InitializeMap(Panel);
+            Controls.Add(LayoutPanels.CreateMainPanel(Panel,GetNextTurnButton()));
+            //Controls.Add(Panel);
+        }
+
+        private void CellClicked(int row, int column)
+        {
+            if ((row < 0) || (column < 0))
+            {
+                return;
+            }
+            if (UnitsPositions[row, column] == null) return;
+
+            else if (UnitsPositions[row, column] == Players[CurrentPlayerIndex].Castle)
+            {
+                Form unitSelector = new UnitSelectorForm();
+                unitSelector.Size = new Size(3 * LayoutPanels.FieldSize, LayoutPanels.FieldSize);
+                unitSelector.Show();
+            }
+
         }
 
         private Point oldLocation;
@@ -29,6 +59,12 @@ namespace TBS_Game
             {
                 isDragging = true;
             }
+
+            else if (e.Button == MouseButtons.Left)
+            {
+                var cellPosition = Panel.GetCellPosition((Control)sender);
+                CellClicked(cellPosition.Row, cellPosition.Column);
+            }
         }
 
         private void Event_MouseMove(object sender, MouseEventArgs e)
@@ -37,10 +73,9 @@ namespace TBS_Game
             {
                 var newLocation = MousePosition;
                 Panel.Location = new Point(Panel.Location.X + (int)(2 * newLocation.X) - oldLocation.X, Panel.Location.Y + (int)(2 * newLocation.Y) - oldLocation.Y);
-                Invalidate();
             }
 
-            oldLocation = new Point((2 * MousePosition.X), (2 * MousePosition.Y));
+            oldLocation = new Point(2 * MousePosition.X, 2 * MousePosition.Y);
         }
 
         private void Event_MouseUp(object sender, MouseEventArgs e)
@@ -49,13 +84,45 @@ namespace TBS_Game
             {
                 isDragging = false;
             }
+        }
 
-            if (e.Button == MouseButtons.Left)
+        private void Event_MouseWheel(object sender, MouseEventArgs e)
+        {
+            try
             {
-                var cellPosition = Panel.GetCellPosition((Control)sender);
-                //CellClicked(cellPosition.Row, cellPosition.Column);
+                SendMessage(this.Handle, WM_SETREDRAW, false, 0);
+                var delta = e.Delta > 0 ? LayoutPanels.FieldSize : -LayoutPanels.FieldSize;
+                if (Panel.Width + delta > LayoutPanels.FieldSize * 10) Panel.Width += delta;
+                if (Panel.Height + delta > LayoutPanels.FieldSize * 10) Panel.Height += delta;
+            }
+            finally
+            {
+                SendMessage(this.Handle, WM_SETREDRAW, true, 0);
+                Refresh();
             }
         }
+
+        private void NextTurnButton_Click(object sender, EventArgs e)
+        {
+            Control ctrl = ((Control)sender);
+            int defeatedPlayersCount = 0;
+            if (CurrentPlayerIndex == Players.Count() - 1)
+            {
+                CurrentPlayerIndex = 0;
+            }
+                
+            else if (Players[CurrentPlayerIndex] == new Player(string.Empty, Color.Transparent))
+            {
+                defeatedPlayersCount += 1;
+                CurrentPlayerIndex += 1;
+                if (defeatedPlayersCount == 3)
+                    throw new NotImplementedException();
+            }
+            else CurrentPlayerIndex += 1;
+            ctrl.BackColor = Players[CurrentPlayerIndex].InterfaceColor;
+            Invalidate();
+        }
+
 
         /// <summary>
         /// этот метод создает pictureBox - ячейку поля
@@ -65,14 +132,16 @@ namespace TBS_Game
         public PictureBox GetPicture(Bitmap pic)
         {
             var picture = new PictureBox();
+            
             picture.BackgroundImage = pic;
             picture.Margin = new Padding(0);
             picture.Dock = DockStyle.Fill;
-            picture.SizeMode = PictureBoxSizeMode.CenterImage;
+            picture.SizeMode = PictureBoxSizeMode.Zoom;
 
             picture.MouseUp += Event_MouseUp;
             picture.MouseDown += Event_MouseDown;
-            picture.MouseMove += Event_MouseMove;
+            //picture.MouseMove += Event_MouseMove;
+            picture.SendToBack();
             return picture;
         }
 
@@ -84,6 +153,7 @@ namespace TBS_Game
         {
             var rnd = new Random();
             panel.SuspendLayout();
+
 
             for (int i = 0; i < MapSize; i++)
                 for (int j = 0; j < MapSize; j++)
@@ -118,26 +188,48 @@ namespace TBS_Game
                                 break;
 
                             case UnitType.Swordsman:
-                                if (UnitsPositions[i, j].Ovner == 0)
+                                if (UnitsPositions[i, j].Ovner == Players[0])
                                     picture.Image = Resource1.redSwordsman;
-                                else if (UnitsPositions[i, j].Ovner == 1)
+
+                                else if (UnitsPositions[i, j].Ovner == Players[1])
                                     picture.Image = Resource1.blueSwordsman;
-                                else if (UnitsPositions[i, j].Ovner == 2)
+
+                                else if (UnitsPositions[i, j].Ovner == Players[2])
                                     picture.Image = Resource1.greenSwordsman;
-                                else picture.Image = Resource1.graySwordsman;
+
+                                else if(UnitsPositions[i, j].Ovner == Players[3])
+                                    picture.Image = Resource1.graySwordsman;
+
                                 break;
 
                             case UnitType.Spearman:
-                                if (UnitsPositions[i, j].Ovner == 0)
+                                if (UnitsPositions[i, j].Ovner == Players[0])
                                     picture.Image = Resource1.redSpearman;
-                                else if (UnitsPositions[i, j].Ovner == 1)
+
+                                else if (UnitsPositions[i, j].Ovner == Players[1])
                                     picture.Image = Resource1.blueSpearman;
-                                else if (UnitsPositions[i, j].Ovner == 2)
+
+                                else if (UnitsPositions[i, j].Ovner == Players[2])
                                     picture.Image = Resource1.greenSpearman;
-                                else picture.Image = Resource1.graySpearman;
+
+                                else if(UnitsPositions[i, j].Ovner == Players[3])
+                                    picture.Image = Resource1.graySpearman;
+
                                 break;
 
                             case UnitType.Knight:
+                                if (UnitsPositions[i, j].Ovner == Players[0])
+                                    picture.Image = Resource1.redSpearman;
+
+                                else if (UnitsPositions[i, j].Ovner == Players[1])
+                                    picture.Image = Resource1.blueSpearman;
+
+                                else if (UnitsPositions[i, j].Ovner == Players[2])
+                                    picture.Image = Resource1.greenSpearman;
+
+                                else if (UnitsPositions[i, j].Ovner == Players[3])
+                                    picture.Image = Resource1.graySpearman;
+
                                 break;
                         }
                     }
@@ -145,6 +237,17 @@ namespace TBS_Game
                     panel.Controls.Add(picture, i, j);
                 }
             panel.ResumeLayout();
+        }
+
+        private Button GetNextTurnButton()
+        {
+            var button = new Button() { Text = "Следующий Ход", ForeColor = Color.White };
+            button.BackColor = Players[CurrentPlayerIndex].InterfaceColor;
+            button.Margin = new Padding(0);
+            button.Dock = DockStyle.Fill;
+            button.Click += NextTurnButton_Click;
+            //button.Anchor = AnchorStyles.Right|AnchorStyles.Bottom;
+            return button;            
         }
     }
 }

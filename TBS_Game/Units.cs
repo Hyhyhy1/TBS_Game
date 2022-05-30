@@ -10,25 +10,40 @@ namespace TBS_Game
 {
     public static class UnitMap
     {
-        public static Unit[,] UnitsPositions = new Unit[MapSize, MapSize];
-        public static List<Point> CastlesPositions;
+        public static Unit[,] UnitsPositions;
+        private static List<Point> CastlesPossiblePositions = new List<Point>();
+        public static Point[] CastlesPositions = new Point[4];
 
-        public static void GenerateUnitsLayout()
+        private static void GetPossiblePositions()
         {
-            for (int i = 0; i < MapSize; i++)
-                for(int j = 0; j < MapSize; j++)
-                {
-                    var neighbours = GetNeighbours(i, j, false);
-                    if(!neighbours.Contains(Cell.SmallForest) && !neighbours.Contains(Cell.Forest) && !neighbours.Contains(Cell.Void) && CastlesPositions.Count <5)
-                    {
-                        foreach (var position in CastlesPositions)
-                            if(Math.Sqrt(Math.Pow(i - position.X, 2) + Math.Pow(j - position.Y, 2)) < 5)
-                                CastlesPositions.Add(new Point(i,j));
-                    }
-
-                }
+            CastlesPossiblePositions.Add(new Point(1, 1));
+            CastlesPossiblePositions.Add(new Point(28, 1));
+            CastlesPossiblePositions.Add(new Point(1, 28));
+            CastlesPossiblePositions.Add(new Point(28, 28));
+            CastlesPossiblePositions.Add(new Point(16,1));
+            CastlesPossiblePositions.Add(new Point(15, 28));
+            CastlesPossiblePositions.Add(new Point(28, 16));
+            CastlesPossiblePositions.Add(new Point(1, 15));
+            CastlesPossiblePositions.Add(new Point(15, 15));
+            CastlesPossiblePositions.Add(new Point(28, 28));
         }
 
+        public static void GenerateCastles()
+        {
+            var rnd = new Random();
+            GetPossiblePositions();
+            UnitsPositions = new Unit[MapSize, MapSize];
+            for (int i = 0; i < CastlesPositions.Length; i++)
+            {
+                var pos = CastlesPossiblePositions[rnd.Next(CastlesPossiblePositions.Count)];
+                CastlesPossiblePositions.Remove(pos);
+                CastlesPositions[i] = pos;
+                var castle = new Castle(GameForm.Players[i]);
+                UnitsPositions[pos.X, pos.Y] = castle;
+                GameForm.Players[i].OwnedUnits.Add(castle);
+                GameForm.Players[i].Castle = castle;
+            }   
+        }
     }
 
     public enum UnitType
@@ -46,53 +61,59 @@ namespace TBS_Game
         protected int moveDistance;
         protected int attackDistance;
         protected bool isMoved;
-        public int Ovner;
+        protected bool isAttacked;
+        public Player Ovner;
     }
 
     public class Spearman : Unit
     {
-        
-
-        public Spearman(int ovner)
+        public Spearman(Player ovner)
         {
             unitType = UnitType.Spearman;
             moveDistance = 1;
             attackDistance = 1;
             isMoved = false;
+            isAttacked = false;
             Ovner = ovner;
         }
     }
 
     public class Swordsman : Unit
     {
-        public Swordsman()
+        public Swordsman(Player ovner)
         {
             unitType = UnitType.Swordsman;
             moveDistance = 1;
             attackDistance = 1;
             isMoved = false;
+            isAttacked = false;
+            Ovner = ovner;
         }
     }
 
     public class Knight : Unit
     {
-        public Knight()
+        public Knight(Player ovner)
         {
             unitType = UnitType.Knight;
             moveDistance = 2;
             attackDistance = 1;
             isMoved = false;
+            isAttacked = false;
+            Ovner = ovner;
         }
     }
 
     public class Castle : Unit
     {
-        public Castle()
+        public Castle(Player ovner)
         {
             unitType = UnitType.Castle;
             moveDistance = 0;
             attackDistance = 0;
             isMoved = true;
+            isAttacked = true;
+            Ovner = ovner;
         }
     }
 }

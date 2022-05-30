@@ -30,8 +30,12 @@ namespace TBS_Game
             var rand = new Random();
             MapSize = size;
             Point initialPoint = new Point(rand.Next(0, size), rand.Next(0, size));
-
+            
             Map = new Cell[size, size];
+            UnitMap.GenerateCastles();
+
+            foreach (var castlePosinion in UnitMap.CastlesPositions)
+                Map[castlePosinion.X, castlePosinion.Y] = Cell.Grass;           
 
             var queue = new Queue<Point>();
             queue.Enqueue(initialPoint);

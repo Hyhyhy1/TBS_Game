@@ -124,11 +124,35 @@
   <data name="BigForest2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Textures\Tile\BigForest2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="blueSpearman" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Textures\Unit\medievalUnit_03.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="blueSwordsman" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Textures\Unit\medievalUnit_04.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Castle" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Textures\Structure\Castle.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Grass" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Textures\Tile\Grass.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="graySpearman" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Textures\Unit\medievalUnit_21.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="graySwordsman" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Textures\Unit\medievalUnit_22.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="greenSpearman" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Textures\Unit\medievalUnit_15.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="greenSwordsman" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Textures\Unit\medievalUnit_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="redSpearman" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Textures\Unit\medievalUnit_09.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="redSwordsman" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Textures\Unit\medievalUnit_10.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SmallForest1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Textures\Tile\SmallForest1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
