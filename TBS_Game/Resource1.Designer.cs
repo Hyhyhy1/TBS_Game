@@ -83,6 +83,16 @@ namespace TBS_Game {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap blueKnight {
+            get {
+                object obj = ResourceManager.GetObject("blueKnight", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap blueSpearman {
             get {
                 object obj = ResourceManager.GetObject("blueSpearman", resourceCulture);
@@ -123,6 +133,16 @@ namespace TBS_Game {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap grayKnight {
+            get {
+                object obj = ResourceManager.GetObject("grayKnight", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap graySpearman {
             get {
                 object obj = ResourceManager.GetObject("graySpearman", resourceCulture);
@@ -143,6 +163,16 @@ namespace TBS_Game {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap greenKnight {
+            get {
+                object obj = ResourceManager.GetObject("greenKnight", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap greenSpearman {
             get {
                 object obj = ResourceManager.GetObject("greenSpearman", resourceCulture);
@@ -156,6 +186,16 @@ namespace TBS_Game {
         public static System.Drawing.Bitmap greenSwordsman {
             get {
                 object obj = ResourceManager.GetObject("greenSwordsman", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap redKnight {
+            get {
+                object obj = ResourceManager.GetObject("redKnight", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -14,19 +14,20 @@ namespace TBS_Game
     {
         public static Player[] Players;
         public static int CurrentPlayerIndex;
+        public static bool SelectionInProggres = false;
 
         [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
 
-        TableLayoutPanel Panel;
+        public static TableLayoutPanel Panel;
         private const int WM_SETREDRAW = 11;
         public GameForm()
         {
             Players = InitializePlayers();
             CurrentPlayerIndex = 0;
             DoubleBuffered = true;
-            MouseWheel += Event_MouseWheel;
-            GenerateMap(30);
+            //MouseWheel += Event_MouseWheel;
+            GenerateMap(16,8);
             Panel = LayoutPanels.CreateFieldPanel();
             InitializeMap(Panel);
             Controls.Add(LayoutPanels.CreateMainPanel(Panel,GetNextTurnButton()));
@@ -35,15 +36,14 @@ namespace TBS_Game
 
         private void CellClicked(int row, int column)
         {
-            if ((row < 0) || (column < 0))
-            {
-                return;
-            }
+            if ((row < 0) || (column < 0)) return;
+
             if (UnitsPositions[row, column] == null) return;
 
-            else if (UnitsPositions[row, column] == Players[CurrentPlayerIndex].Castle)
+            else if (UnitsPositions[row, column] == Players[CurrentPlayerIndex].Castle && !SelectionInProggres)
             {
-                Form unitSelector = new UnitSelectorForm();
+                SelectionInProggres = true;
+                Form unitSelector = new UnitSelectorForm(new Point(row,column));
                 unitSelector.Size = new Size(3 * LayoutPanels.FieldSize, LayoutPanels.FieldSize);
                 unitSelector.Show();
             }
@@ -106,6 +106,7 @@ namespace TBS_Game
         {
             Control ctrl = ((Control)sender);
             int defeatedPlayersCount = 0;
+            var table = ctrl.Parent as TableLayoutPanel;
             if (CurrentPlayerIndex == Players.Count() - 1)
             {
                 CurrentPlayerIndex = 0;
@@ -120,6 +121,8 @@ namespace TBS_Game
             }
             else CurrentPlayerIndex += 1;
             ctrl.BackColor = Players[CurrentPlayerIndex].InterfaceColor;
+            table.GetControlFromPosition(0,1).BackColor = Players[CurrentPlayerIndex].InterfaceColor;
+            table.GetControlFromPosition(1,0).BackColor = Players[CurrentPlayerIndex].InterfaceColor;
             Invalidate();
         }
 
@@ -141,7 +144,6 @@ namespace TBS_Game
             picture.MouseUp += Event_MouseUp;
             picture.MouseDown += Event_MouseDown;
             //picture.MouseMove += Event_MouseMove;
-            picture.SendToBack();
             return picture;
         }
 
@@ -155,8 +157,8 @@ namespace TBS_Game
             panel.SuspendLayout();
 
 
-            for (int i = 0; i < MapSize; i++)
-                for (int j = 0; j < MapSize; j++)
+            for (int i = 0; i < MapHeight; i++)
+                for (int j = 0; j < MapWidth; j++)
                 {
                     var picture = new PictureBox();
                     switch (Map[i, j])
@@ -164,7 +166,6 @@ namespace TBS_Game
                         case Cell.Grass:
 
                             picture = GetPicture(Resource1.Grass);
-
                             break;
 
                         case Cell.SmallForest:
@@ -179,62 +180,9 @@ namespace TBS_Game
                             
                             break;
                     }
-                    if(UnitsPositions[i, j] != null)
-                    {
-                        switch (UnitsPositions[i, j].unitType)
-                        {
-                            case UnitType.Castle:
-                                picture.Image = Resource1.Castle;
-                                break;
+                    InitializeUnits(picture, i, j);
 
-                            case UnitType.Swordsman:
-                                if (UnitsPositions[i, j].Ovner == Players[0])
-                                    picture.Image = Resource1.redSwordsman;
-
-                                else if (UnitsPositions[i, j].Ovner == Players[1])
-                                    picture.Image = Resource1.blueSwordsman;
-
-                                else if (UnitsPositions[i, j].Ovner == Players[2])
-                                    picture.Image = Resource1.greenSwordsman;
-
-                                else if(UnitsPositions[i, j].Ovner == Players[3])
-                                    picture.Image = Resource1.graySwordsman;
-
-                                break;
-
-                            case UnitType.Spearman:
-                                if (UnitsPositions[i, j].Ovner == Players[0])
-                                    picture.Image = Resource1.redSpearman;
-
-                                else if (UnitsPositions[i, j].Ovner == Players[1])
-                                    picture.Image = Resource1.blueSpearman;
-
-                                else if (UnitsPositions[i, j].Ovner == Players[2])
-                                    picture.Image = Resource1.greenSpearman;
-
-                                else if(UnitsPositions[i, j].Ovner == Players[3])
-                                    picture.Image = Resource1.graySpearman;
-
-                                break;
-
-                            case UnitType.Knight:
-                                if (UnitsPositions[i, j].Ovner == Players[0])
-                                    picture.Image = Resource1.redSpearman;
-
-                                else if (UnitsPositions[i, j].Ovner == Players[1])
-                                    picture.Image = Resource1.blueSpearman;
-
-                                else if (UnitsPositions[i, j].Ovner == Players[2])
-                                    picture.Image = Resource1.greenSpearman;
-
-                                else if (UnitsPositions[i, j].Ovner == Players[3])
-                                    picture.Image = Resource1.graySpearman;
-
-                                break;
-                        }
-                    }
-                    
-                    panel.Controls.Add(picture, i, j);
+                    panel.Controls.Add(picture, j, i);
                 }
             panel.ResumeLayout();
         }
@@ -246,7 +194,6 @@ namespace TBS_Game
             button.Margin = new Padding(0);
             button.Dock = DockStyle.Fill;
             button.Click += NextTurnButton_Click;
-            //button.Anchor = AnchorStyles.Right|AnchorStyles.Bottom;
             return button;            
         }
     }

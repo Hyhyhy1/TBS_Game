@@ -18,20 +18,22 @@ namespace TBS_Game
 
     public static class MapCreator
     {
-        public static int MapSize { get; private set; }
+        public static int MapWidth { get; private set; }
+        public static int MapHeight { get; private set; }
         public static Cell[,] Map { get; set; }
 
         /// <summary>
         /// данный метод создает квадратную карту из случайных полей
         /// </summary>
         /// <param name="size">размер поля</param>
-        public static void GenerateMap(int size)
+        public static void GenerateMap(int width, int height)
         {
             var rand = new Random();
-            MapSize = size;
-            Point initialPoint = new Point(rand.Next(0, size), rand.Next(0, size));
+            MapWidth = width;
+            MapHeight = height;
+            Point initialPoint = new Point(rand.Next(0, MapHeight), rand.Next(0, MapWidth ));
             
-            Map = new Cell[size, size];
+            Map = new Cell[MapHeight, MapWidth];
             UnitMap.GenerateCastles();
 
             foreach (var castlePosinion in UnitMap.CastlesPositions)
@@ -43,7 +45,7 @@ namespace TBS_Game
             while (queue.Count != 0)
             {
                 var point = queue.Dequeue();
-                if (point.X < 0 || point.X >= MapSize || point.Y < 0 || point.Y >= MapSize) continue;
+                if (point.X < 0 || point.X >= MapHeight || point.Y < 0 || point.Y >= MapWidth) continue;
                 if (Map[point.X, point.Y] != Cell.Void) continue;
 
                 var neighbours = new List<Cell>();
@@ -52,7 +54,7 @@ namespace TBS_Game
                     for (var dx = -1; dx <= 1; dx++)
                     {
                         if (dx != 0 && dy != 0) continue;
-                        if (point.X + dx < 0 || point.X + dx > MapSize - 1 || point.Y + dy < 0 || point.Y + dy > MapSize - 1) continue;
+                        if (point.X + dx < 0 || point.X + dx > MapHeight - 1 || point.Y + dy < 0 || point.Y + dy > MapWidth - 1) continue;
 
                         var neighbourPosition = new Point(point.X + dx, point.Y + dy);
                         neighbours.Add(Map[neighbourPosition.X, neighbourPosition.Y]);
@@ -90,7 +92,7 @@ namespace TBS_Game
                     if(isSimpleSearch)
                         if (dx != 0 && dy != 0) continue;
 
-                    if (i + dx < 0 || i + dx > MapSize - 1 || j + dy < 0 || j + dy > MapSize - 1) continue;
+                    if (i + dx < 0 || i + dx > MapHeight - 1 || j + dy < 0 || j + dy > MapWidth - 1) continue;
 
                     neighbours.Add(Map[i + dx, j + dy]);
                 }

@@ -18,7 +18,7 @@ namespace TBS_Game
             Application.SetCompatibleTextRenderingDefault(false);
             var gameForm = new GameForm();
             gameForm.Text = "TBS_Game";
-            gameForm.Size = new System.Drawing.Size(650, 600);
+            gameForm.Size = new System.Drawing.Size(1000, 700);
             gameForm.BackColor = System.Drawing.Color.Black;
             Application.Run(gameForm);
         }

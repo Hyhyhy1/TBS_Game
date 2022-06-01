@@ -11,7 +11,8 @@ namespace TBS_Game
     public class LayoutPanels
     {
         static public int FieldSize = 128;
-        static private int FieldsCount = MapCreator.MapSize;
+        static private int FieldHeight = MapCreator.MapHeight;
+        static private int FieldWidth = MapCreator.MapWidth;
 
         /// <summary>
         /// данный метод создает TableLayoutPanel для хранения ячеек
@@ -22,19 +23,20 @@ namespace TBS_Game
             var panel = new TableLayoutPanel();
             panel.Location = new Point(-100, -100);
 
-            panel.ColumnCount = FieldsCount;
-            panel.RowCount = FieldsCount;
+            panel.ColumnCount = FieldWidth;
+            panel.RowCount = FieldHeight;
 
-            panel.Width = FieldsCount * FieldSize;
-            panel.Height = FieldsCount * FieldSize;
+            panel.Width = FieldWidth * FieldSize;
+            panel.Height = FieldHeight * FieldSize;
+            panel.Margin = new Padding(0);
 
-            for (int i = 0; i < FieldsCount; i++)
+            for (int i = 0; i < FieldHeight; i++)
             {
-                panel.RowStyles.Add(new RowStyle(SizeType.Percent, FieldSize));
+                panel.RowStyles.Add(new RowStyle(SizeType.Percent, 100/FieldHeight));
             }
-            for (int j = 0; j < FieldsCount; j++)
+            for (int j = 0; j < FieldWidth; j++)
             {
-                panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, FieldSize));
+                panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100/FieldWidth));
             }
             panel.GrowStyle = TableLayoutPanelGrowStyle.FixedSize;
             return panel;
