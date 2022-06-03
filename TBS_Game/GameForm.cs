@@ -142,10 +142,15 @@ namespace TBS_Game
             Control ctrl = ((Control)sender);
             SelectionInProggres = false;
 
-            if (DefeatedPlayersIndexes.Count == 3)
+            if (DefeatedPlayersIndexes.Count > 2)
             {
+                string playerColor = "";
+                for (int i = 0; i < Players.Length; i++)
+                    if (!DefeatedPlayersIndexes.Contains(i))
+                        playerColor = Players[i].PlayerColor;
+
                 Form finalForm = new Form();
-                finalForm.Controls.Add(new Label() { Text = "Победа!", Dock = DockStyle.Fill });
+                finalForm.Controls.Add(new Label() { Text = "Победа " + playerColor + " игрока!", Dock = DockStyle.Fill, AutoSize = true });
                 finalForm.Show();
                 
             }

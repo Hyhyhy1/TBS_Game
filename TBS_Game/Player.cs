@@ -8,7 +8,7 @@ namespace TBS_Game
     public class Player
     {
         public List<Unit> OwnedUnits = new List<Unit>();
-        readonly string PlayerColor;
+        public readonly string PlayerColor;
         public readonly Color InterfaceColor;
         public Castle Castle;
         public Player(string color, Color interfaceColor)
@@ -29,10 +29,10 @@ namespace TBS_Game
         public static Player[] InitializePlayers()
         {
             List<Player> players = new List<Player>();
-            players.Add(new Player("red", Color.DarkRed));
-            players.Add(new Player("blue", Color.LightSkyBlue));
-            players.Add(new Player("green", Color.LimeGreen));
-            players.Add(new Player("gray", Color.LightGray));
+            players.Add(new Player("красного", Color.DarkRed));
+            players.Add(new Player("синего", Color.LightSkyBlue));
+            players.Add(new Player("зеленого", Color.LimeGreen));
+            players.Add(new Player("серого", Color.LightGray));
             return players.ToArray();
         }
     }
