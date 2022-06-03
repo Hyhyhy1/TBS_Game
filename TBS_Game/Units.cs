@@ -42,7 +42,7 @@ namespace TBS_Game
                 CastlesPositions[i] = pos;
                 var castle = new Castle(GameForm.Players[i],pos);
                 UnitsPositions[pos.X, pos.Y] = castle;
-                GameForm.Players[i].OwnedUnits.Add(castle);
+                //GameForm.Players[i].OwnedUnits.Add(castle);
                 GameForm.Players[i].Castle = castle;
             }   
         }
@@ -103,6 +103,7 @@ namespace TBS_Game
                         break;
                 }
             }
+            else picture.Image = null;
         }
     }
 
@@ -120,10 +121,39 @@ namespace TBS_Game
         public Point UnitPosition;
         internal UnitType unitType;
         protected int moveDistance;
-        protected int attackDistance;
-        protected bool isMoved;
-        protected bool isAttacked;
+        internal bool isMoved;
         public Player Ovner;
+
+        public static void Move(Unit selectedUnit, Unit targetUnit, int row, int column)
+        {
+            if (targetUnit != null && targetUnit.unitType == UnitType.Castle)
+                DefeatedPlayersIndexes.Add(Array.IndexOf(Players, targetUnit.Ovner));
+
+            if (!IsPossibleMove(selectedUnit, row, column))
+                return;
+
+            UnitMap.UnitsPositions[selectedUnit.UnitPosition.X, selectedUnit.UnitPosition.Y] = null;
+            UnitMap.UnitsPositions[row, column] = selectedUnit;
+            UnitMap.InitializeUnits(GameForm.Panel.GetControlFromPosition(selectedUnit.UnitPosition.Y, selectedUnit.UnitPosition.X) as PictureBox, selectedUnit.UnitPosition.X, selectedUnit.UnitPosition.Y);
+            selectedUnit.UnitPosition = new Point(row, column);
+            UnitMap.InitializeUnits(GameForm.Panel.GetControlFromPosition(column, row) as PictureBox, row, column);
+            SelectedUnit = null;
+            selectedUnit.isMoved = true;
+        }
+
+        private static bool IsPossibleMove(Unit selectedUnit, int row, int column)
+        {
+            var dx = Math.Abs(row - selectedUnit.UnitPosition.X);
+            var dy = Math.Abs(column - selectedUnit.UnitPosition.Y);
+            int delta = dx + dy;
+
+            if(selectedUnit.unitType == UnitType.Knight)
+                return delta < 3;
+
+            else
+                return (dx<2 && dy<2);
+            
+        }
     }
 
     public class Spearman : Unit
@@ -132,9 +162,7 @@ namespace TBS_Game
         {
             unitType = UnitType.Spearman;
             moveDistance = 1;
-            attackDistance = 1;
             isMoved = false;
-            isAttacked = false;
             Ovner = ovner;
             UnitPosition = position;
         }
@@ -146,9 +174,7 @@ namespace TBS_Game
         {
             unitType = UnitType.Swordsman;
             moveDistance = 1;
-            attackDistance = 1;
             isMoved = false;
-            isAttacked = false;
             Ovner = ovner;
             UnitPosition = position;
         }
@@ -160,9 +186,7 @@ namespace TBS_Game
         {
             unitType = UnitType.Knight;
             moveDistance = 2;
-            attackDistance = 1;
             isMoved = false;
-            isAttacked = false;
             Ovner = ovner;
             UnitPosition = position;
         }
@@ -174,9 +198,7 @@ namespace TBS_Game
         {
             unitType = UnitType.Castle;
             moveDistance = 0;
-            attackDistance = 0;
             isMoved = true;
-            isAttacked = true;
             Ovner = ovner;
             UnitPosition = position;
         }

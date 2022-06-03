@@ -15,6 +15,8 @@ namespace TBS_Game
         public static Player[] Players;
         public static int CurrentPlayerIndex;
         public static bool SelectionInProggres = false;
+        internal static Unit SelectedUnit = null;
+        internal static List<int> DefeatedPlayersIndexes = new List<int>();
 
         [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
@@ -26,17 +28,90 @@ namespace TBS_Game
             Players = InitializePlayers();
             CurrentPlayerIndex = 0;
             DoubleBuffered = true;
-            //MouseWheel += Event_MouseWheel;
             GenerateMap(16,8);
             Panel = LayoutPanels.CreateFieldPanel();
             InitializeMap(Panel);
             Controls.Add(LayoutPanels.CreateMainPanel(Panel,GetNextTurnButton()));
-            //Controls.Add(Panel);
         }
 
+        /// <summary>
+        /// немного перегруженный метод, делающий все и сразу, но проект нужно было заканчивать \(0_o\)
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
         private void CellClicked(int row, int column)
         {
             if ((row < 0) || (column < 0)) return;
+
+            if (SelectedUnit != null)
+            {              
+                if (SelectedUnit.isMoved)
+                {
+                    SelectedUnit = null;
+                    return;
+                }
+
+                var selectedUnit = SelectedUnit;
+                var targetUnit = UnitsPositions[row, column];
+
+                if (selectedUnit == targetUnit)
+                {
+                    SelectedUnit = null;
+                    return;
+                }
+
+
+                if (targetUnit == null)
+                {
+                    Unit.Move(selectedUnit, targetUnit, row, column);
+                    return;
+                }                
+
+                if (selectedUnit.Ovner == targetUnit.Ovner)
+                    return;
+
+                if (selectedUnit == targetUnit)
+                    return;
+
+                if (selectedUnit.unitType == UnitType.Spearman)
+                {
+                    if (targetUnit.unitType != UnitType.Knight && targetUnit.unitType != UnitType.Castle)
+                        return;
+
+                    else
+                    {
+                        targetUnit.Ovner.OwnedUnits.Remove(targetUnit);
+                        Unit.Move(selectedUnit, targetUnit, row, column);
+                        return;
+                    }
+                }
+
+                if(selectedUnit.unitType == UnitType.Knight)
+                {
+                    if (targetUnit.unitType != UnitType.Swordsman && targetUnit.unitType != UnitType.Castle)
+                        return;
+
+                    else
+                    {
+                        targetUnit.Ovner.OwnedUnits.Remove(targetUnit);
+                        Unit.Move(selectedUnit, targetUnit, row, column);
+                        return;
+                    }
+                }
+
+                if (selectedUnit.unitType == UnitType.Swordsman)
+                {
+                    if (targetUnit.unitType != UnitType.Spearman && targetUnit.unitType != UnitType.Castle)
+                        return;
+
+                    else
+                    {
+                        targetUnit.Ovner.OwnedUnits.Remove(targetUnit);
+                        Unit.Move(selectedUnit, targetUnit, row, column);
+                        return;
+                    }
+                }
+            }
 
             if (UnitsPositions[row, column] == null) return;
 
@@ -47,85 +122,56 @@ namespace TBS_Game
                 unitSelector.Size = new Size(3 * LayoutPanels.FieldSize, LayoutPanels.FieldSize);
                 unitSelector.Show();
             }
-
+            else if(UnitsPositions[row, column].Ovner == Players[CurrentPlayerIndex] && SelectedUnit == null)
+            {
+                SelectedUnit = UnitsPositions[row, column];
+            }
         }
-
-        private Point oldLocation;
-        private bool isDragging = false;
 
         private void Event_MouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
-            {
-                isDragging = true;
-            }
-
-            else if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
             {
                 var cellPosition = Panel.GetCellPosition((Control)sender);
                 CellClicked(cellPosition.Row, cellPosition.Column);
             }
         }
 
-        private void Event_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (isDragging)
-            {
-                var newLocation = MousePosition;
-                Panel.Location = new Point(Panel.Location.X + (int)(2 * newLocation.X) - oldLocation.X, Panel.Location.Y + (int)(2 * newLocation.Y) - oldLocation.Y);
-            }
-
-            oldLocation = new Point(2 * MousePosition.X, 2 * MousePosition.Y);
-        }
-
-        private void Event_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                isDragging = false;
-            }
-        }
-
-        private void Event_MouseWheel(object sender, MouseEventArgs e)
-        {
-            try
-            {
-                SendMessage(this.Handle, WM_SETREDRAW, false, 0);
-                var delta = e.Delta > 0 ? LayoutPanels.FieldSize : -LayoutPanels.FieldSize;
-                if (Panel.Width + delta > LayoutPanels.FieldSize * 10) Panel.Width += delta;
-                if (Panel.Height + delta > LayoutPanels.FieldSize * 10) Panel.Height += delta;
-            }
-            finally
-            {
-                SendMessage(this.Handle, WM_SETREDRAW, true, 0);
-                Refresh();
-            }
-        }
-
+        /// <summary>
+        /// Этот метод переключает ход и сбрасывает значение IsMoved у юнитов
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NextTurnButton_Click(object sender, EventArgs e)
         {
             Control ctrl = ((Control)sender);
-            int defeatedPlayersCount = 0;
+            SelectionInProggres = false;
+
+            if (DefeatedPlayersIndexes.Count == 3)
+            {
+                Form finalForm = new Form();
+                finalForm.Controls.Add(new Label() { Text = "Победа!", Dock = DockStyle.Fill });
+                finalForm.Show();
+                
+            }
+                
+
             var table = ctrl.Parent as TableLayoutPanel;
             if (CurrentPlayerIndex == Players.Count() - 1)
             {
                 CurrentPlayerIndex = 0;
-            }
-                
-            else if (Players[CurrentPlayerIndex] == new Player(string.Empty, Color.Transparent))
-            {
-                defeatedPlayersCount += 1;
-                CurrentPlayerIndex += 1;
-                if (defeatedPlayersCount == 3)
-                    throw new NotImplementedException();
+                foreach(var player in Players)
+                {
+                    foreach (var unit in player.OwnedUnits)
+                        unit.isMoved = false;
+                }
             }
             else CurrentPlayerIndex += 1;
             ctrl.BackColor = Players[CurrentPlayerIndex].InterfaceColor;
             table.GetControlFromPosition(0,1).BackColor = Players[CurrentPlayerIndex].InterfaceColor;
             table.GetControlFromPosition(1,0).BackColor = Players[CurrentPlayerIndex].InterfaceColor;
-            Invalidate();
+            SelectedUnit = null;
         }
-
 
         /// <summary>
         /// этот метод создает pictureBox - ячейку поля
@@ -141,9 +187,7 @@ namespace TBS_Game
             picture.Dock = DockStyle.Fill;
             picture.SizeMode = PictureBoxSizeMode.Zoom;
 
-            picture.MouseUp += Event_MouseUp;
             picture.MouseDown += Event_MouseDown;
-            //picture.MouseMove += Event_MouseMove;
             return picture;
         }
 
@@ -187,6 +231,10 @@ namespace TBS_Game
             panel.ResumeLayout();
         }
 
+        /// <summary>
+        /// этот метот создает кнопку следующего хода
+        /// </summary>
+        /// <returns></returns>
         private Button GetNextTurnButton()
         {
             var button = new Button() { Text = "Следующий Ход", ForeColor = Color.White };

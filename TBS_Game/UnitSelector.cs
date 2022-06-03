@@ -67,7 +67,6 @@ namespace TBS_Game
                 UnitCreated = true;
             }
             UnitMap.InitializeUnits(GameForm.Panel.GetControlFromPosition(points[0].Y, points[0].X) as PictureBox, points[0].X, points[0].Y);
-            GameForm.SelectionInProggres = false;
             Close();    
         }
 

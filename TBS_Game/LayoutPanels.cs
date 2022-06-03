@@ -41,20 +41,7 @@ namespace TBS_Game
             panel.GrowStyle = TableLayoutPanelGrowStyle.FixedSize;
             return panel;
         }
-        //public static TableLayoutPanel CreateMainPanel(Button turnButton)
-        //{
-        //    var panel = new TableLayoutPanel();
-        //    panel.Dock = DockStyle.Fill;
-        //    panel.RowStyles.Add(new RowStyle(SizeType.Percent, 90));
-        //    panel.RowStyles.Add(new RowStyle(SizeType.Percent, 10));
-        //    panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 90));
-        //    panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10));
-        //    //panel.Controls.Add(new Panel() { BackColor = Color.Transparent, Dock = DockStyle.Fill }, 0, 0);
-        //    //panel.Controls.Add(new Panel() { BackColor = Color.Transparent, Dock = DockStyle.Fill }, 0, 1);
-        //    //panel.Controls.Add(new Panel() { BackColor = Color.Transparent, Dock = DockStyle.Fill }, 1, 0);
-        //    panel.Controls.Add(turnButton, 1, 1);
-        //    return panel;
-        //}
+
         public static TableLayoutPanel CreateMainPanel(TableLayoutPanel gameField, Button turnButton)
         {
             var panel = new TableLayoutPanel();
