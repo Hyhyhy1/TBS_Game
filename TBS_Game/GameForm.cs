@@ -17,12 +17,7 @@ namespace TBS_Game
         public static bool SelectionInProggres = false;
         internal static Unit SelectedUnit = null;
         internal static List<int> DefeatedPlayersIndexes = new List<int>();
-
-        [DllImport("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
-
         public static TableLayoutPanel Panel;
-        private const int WM_SETREDRAW = 11;
         public GameForm()
         {
             Players = InitializePlayers();
