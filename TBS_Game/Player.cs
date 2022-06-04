@@ -29,10 +29,10 @@ namespace TBS_Game
         public static Player[] InitializePlayers()
         {
             List<Player> players = new List<Player>();
-            players.Add(new Player("красного", Color.DarkRed));
-            players.Add(new Player("синего", Color.LightSkyBlue));
-            players.Add(new Player("зеленого", Color.LimeGreen));
-            players.Add(new Player("серого", Color.LightGray));
+            players.Add(new Player("Красный", Color.DarkRed));
+            players.Add(new Player("Синий", Color.LightSkyBlue));
+            players.Add(new Player("Зеленый", Color.LimeGreen));
+            players.Add(new Player("Серый", Color.LightGray));
             return players.ToArray();
         }
     }

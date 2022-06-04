@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using static TBS_Game.MapCreator;
 using static TBS_Game.UnitMap;
@@ -20,13 +19,14 @@ namespace TBS_Game
         public static TableLayoutPanel Panel;
         public GameForm()
         {
-            Players = InitializePlayers();
-            CurrentPlayerIndex = 0;
-            DoubleBuffered = true;
-            GenerateMap(16,8);
-            Panel = LayoutPanels.CreateFieldPanel();
-            InitializeMap(Panel);
-            Controls.Add(LayoutPanels.CreateMainPanel(Panel,GetNextTurnButton()));
+            GetMainMenu();
+        }
+
+        private void GetMainMenu()
+        {
+            Controls.Clear();
+            Panel = LayoutPanels.GetGameStartPanel(GetGameStartButton(), GetRulesButton());
+            Controls.Add(Panel);
         }
 
         /// <summary>
@@ -150,7 +150,9 @@ namespace TBS_Game
                         playerColor = Players[i].PlayerColor;
 
                 Form finalForm = new Form();
-                finalForm.Controls.Add(new Label() { Text = "Победа " + playerColor + " игрока!", Dock = DockStyle.Fill, AutoSize = true });
+                if (DefeatedPlayersIndexes.Count == 3)
+                    finalForm.Controls.Add(new Label() { Text = playerColor + " игрок победил!", Dock = DockStyle.Fill, AutoSize = true });
+                else finalForm.Controls.Add(new Label() { Text = "Ничья?!", Dock = DockStyle.Fill, AutoSize = true });
                 finalForm.Show();
                 
             }
@@ -243,6 +245,84 @@ namespace TBS_Game
             button.Dock = DockStyle.Fill;
             button.Click += NextTurnButton_Click;
             return button;            
+        }
+
+        /// <summary>
+        /// конструктор кнопки, начинающей игру
+        /// </summary>
+        /// <returns>кнопка, начинающая игру</returns>
+        private Button GetGameStartButton()
+        {
+            var button = new Button() { Text = "Начать игру" };
+            button.Margin = new Padding(0);
+            button.Dock = DockStyle.Fill;
+            button.Click += GameStartButton_Click;
+            return button;
+        }
+
+        /// <summary>
+        /// этот метод срабатывает при нажатии на кнопку "начать игру". Создает игровое поле, генерирует карту.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GameStartButton_Click(object sender, EventArgs e)
+        {
+            Panel = new TableLayoutPanel();
+            Controls.Clear();
+            Players = InitializePlayers();
+            CurrentPlayerIndex = 0;
+            DoubleBuffered = true;
+            GenerateMap(16, 8);
+            Panel = LayoutPanels.CreateFieldPanel();
+            InitializeMap(Panel);
+            Controls.Add(LayoutPanels.CreateMainPanel(Panel, GetNextTurnButton()));
+        }
+
+        /// <summary>
+        /// конструктор кнопки, открывающей страницу с правилами
+        /// </summary>
+        /// <returns>кнопка, открывающая страницу с правилами</returns>
+        private Button GetRulesButton()
+        {
+            var button = new Button() { Text = "Правила" };
+            button.Margin = new Padding(0);
+            button.Dock = DockStyle.Fill;
+            button.Click += RulesButton_Click;
+            return button;
+        }
+
+        /// <summary>
+        /// этот метод срабатывает при нажатии на кнопку "правила"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RulesButton_Click(object sender, EventArgs e)
+        {
+            Controls.Clear();
+            Controls.Add(LayoutPanels.GetRulesTable(GetBackToMenuButton()));
+        }
+
+        /// <summary>
+        /// конструктор кнопки, возвращающей в главное меню
+        /// </summary>
+        /// <returns></returns>
+        private Button GetBackToMenuButton()
+        {
+            var button = new Button() { Text = "Назад" };
+            button.Margin = new Padding(0);
+            button.Dock = DockStyle.Fill;
+            button.Click += BackToMenuButton_Click;
+            return button;
+        }
+
+        /// <summary>
+        /// этот метод срабатывает при нажатии на кнопку "назад в главное меню"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BackToMenuButton_Click(object sender, EventArgs e)
+        {
+            GetMainMenu();
         }
     }
 }
